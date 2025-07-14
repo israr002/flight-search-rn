@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
-import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS } from '../theme/theme';
+import { Colors } from '@/constants/Colors';
+import { BorderRadius, Spacing, Typography, Shadows } from '@/constants/Metrics';
 
 interface ToastProps {
   message: string;
@@ -33,26 +34,26 @@ const Toast: React.FC<ToastProps> = ({ message, type, onHide, testID }) => {
   const getBackgroundColor = () => {
     switch (type) {
       case 'success':
-        return COLORS.status.successLight;
+        return Colors.success;
       case 'error':
-        return COLORS.status.errorLight;
+        return Colors.error;
       case 'warning':
-        return COLORS.status.warningLight;
+        return Colors.warning;
       default:
-        return COLORS.gray[100];
+        return Colors.light.secondaryBg;
     }
   };
 
   const getTextColor = () => {
     switch (type) {
       case 'success':
-        return COLORS.success;
+        return Colors.white;
       case 'error':
-        return COLORS.error;
+        return Colors.white;
       case 'warning':
-        return COLORS.warning;
+        return Colors.white;
       default:
-        return COLORS.text.primary;
+        return Colors.light.text;
     }
   };
 
@@ -74,25 +75,19 @@ const styles = StyleSheet.create({
   container: {
     position: 'absolute',
     top: 50,
-    left: SPACING[4],
-    right: SPACING[4],
-    padding: SPACING[3],
-    borderRadius: BORDER_RADIUS.base,
-    shadowColor: COLORS.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    left: Spacing.medium,
+    right: Spacing.medium,
+    padding: Spacing.small,
+    borderRadius: BorderRadius.medium,
+    ...Shadows.medium,
     zIndex: 1000,
   },
   text: {
-    fontSize: TYPOGRAPHY.fontSize.sm,
+    fontSize: Typography.fontSize.sm,
     textAlign: 'center',
-    fontWeight: '500',
+    fontWeight: Typography.fontWeight.medium,
   },
 });
 
 export default Toast; 
+ 

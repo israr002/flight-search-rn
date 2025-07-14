@@ -1,0 +1,206 @@
+{
+  "status": true,
+  "timestamp": 1752244617146,
+  "data": [
+    {
+      "skyId": "NYCA",
+      "entityId": "27537542",
+      "presentation": {
+        "title": "New York",
+        "suggestionTitle": "New York (Any)",
+        "subtitle": "United States"
+      },
+      "navigation": {
+        "entityId": "27537542",
+        "entityType": "CITY",
+        "localizedName": "New York",
+        "relevantFlightParams": {
+          "skyId": "NYCA",
+          "entityId": "27537542",
+          "flightPlaceType": "CITY",
+          "localizedName": "New York"
+        },
+        "relevantHotelParams": {
+          "entityId": "27537542",
+          "entityType": "CITY",
+          "localizedName": "New York"
+        }
+      }
+    },
+    {
+      "skyId": "EWR",
+      "entityId": "95565059",
+      "presentation": {
+        "title": "New York Newark",
+        "suggestionTitle": "New York Newark (EWR)",
+        "subtitle": "United States"
+      },
+      "navigation": {
+        "entityId": "95565059",
+        "entityType": "AIRPORT",
+        "localizedName": "New York Newark",
+        "relevantFlightParams": {
+          "skyId": "EWR",
+          "entityId": "95565059",
+          "flightPlaceType": "AIRPORT",
+          "localizedName": "New York Newark"
+        },
+        "relevantHotelParams": {
+          "entityId": "27537542",
+          "entityType": "CITY",
+          "localizedName": "New York"
+        }
+      }
+    },
+    {
+      "skyId": "JFK",
+      "entityId": "95565058",
+      "presentation": {
+        "title": "New York John F. Kennedy",
+        "suggestionTitle": "New York John F. Kennedy (JFK)",
+        "subtitle": "United States"
+      },
+      "navigation": {
+        "entityId": "95565058",
+        "entityType": "AIRPORT",
+        "localizedName": "New York John F. Kennedy",
+        "relevantFlightParams": {
+          "skyId": "JFK",
+          "entityId": "95565058",
+          "flightPlaceType": "AIRPORT",
+          "localizedName": "New York John F. Kennedy"
+        },
+        "relevantHotelParams": {
+          "entityId": "27537542",
+          "entityType": "CITY",
+          "localizedName": "New York"
+        }
+      }
+    },
+    {
+      "skyId": "LGA",
+      "entityId": "95565057",
+      "presentation": {
+        "title": "New York LaGuardia",
+        "suggestionTitle": "New York LaGuardia (LGA)",
+        "subtitle": "United States"
+      },
+      "navigation": {
+        "entityId": "95565057",
+        "entityType": "AIRPORT",
+        "localizedName": "New York LaGuardia",
+        "relevantFlightParams": {
+          "skyId": "LGA",
+          "entityId": "95565057",
+          "flightPlaceType": "AIRPORT",
+          "localizedName": "New York LaGuardia"
+        },
+        "relevantHotelParams": {
+          "entityId": "27537542",
+          "entityType": "CITY",
+          "localizedName": "New York"
+        }
+      }
+    },
+    {
+      "skyId": "NAP",
+      "entityId": "95673535",
+      "presentation": {
+        "title": "Naples International",
+        "suggestionTitle": "Naples International (NAP)",
+        "subtitle": "Italy"
+      },
+      "navigation": {
+        "entityId": "95673535",
+        "entityType": "AIRPORT",
+        "localizedName": "Naples International",
+        "relevantFlightParams": {
+          "skyId": "NAP",
+          "entityId": "95673535",
+          "flightPlaceType": "AIRPORT",
+          "localizedName": "Naples International"
+        },
+        "relevantHotelParams": {
+          "entityId": "27545086",
+          "entityType": "CITY",
+          "localizedName": "Naples"
+        }
+      }
+    },
+    {
+      "skyId": "NCE",
+      "entityId": "95673860",
+      "presentation": {
+        "title": "Nice",
+        "suggestionTitle": "Nice (NCE)",
+        "subtitle": "France"
+      },
+      "navigation": {
+        "entityId": "95673860",
+        "entityType": "AIRPORT",
+        "localizedName": "Nice",
+        "relevantFlightParams": {
+          "skyId": "NCE",
+          "entityId": "95673860",
+          "flightPlaceType": "AIRPORT",
+          "localizedName": "Nice"
+        },
+        "relevantHotelParams": {
+          "entityId": "27545091",
+          "entityType": "CITY",
+          "localizedName": "Nice"
+        }
+      }
+    },
+    {
+      "skyId": "NL",
+      "entityId": "29475378",
+      "presentation": {
+        "title": "Netherlands",
+        "suggestionTitle": "Netherlands",
+        "subtitle": ""
+      },
+      "navigation": {
+        "entityId": "29475378",
+        "entityType": "COUNTRY",
+        "localizedName": "Netherlands",
+        "relevantFlightParams": {
+          "skyId": "NL",
+          "entityId": "29475378",
+          "flightPlaceType": "COUNTRY",
+          "localizedName": "Netherlands"
+        },
+        "relevantHotelParams": {
+          "entityId": "29475378",
+          "entityType": "COUNTRY",
+          "localizedName": "Netherlands"
+        }
+      }
+    },
+    {
+      "skyId": "NTE",
+      "entityId": "95673933",
+      "presentation": {
+        "title": "Nantes",
+        "suggestionTitle": "Nantes (NTE)",
+        "subtitle": "France"
+      },
+      "navigation": {
+        "entityId": "95673933",
+        "entityType": "AIRPORT",
+        "localizedName": "Nantes",
+        "relevantFlightParams": {
+          "skyId": "NTE",
+          "entityId": "95673933",
+          "flightPlaceType": "AIRPORT",
+          "localizedName": "Nantes"
+        },
+        "relevantHotelParams": {
+          "entityId": "27545159",
+          "entityType": "CITY",
+          "localizedName": "Nantes"
+        }
+      }
+    }
+  ]
+}

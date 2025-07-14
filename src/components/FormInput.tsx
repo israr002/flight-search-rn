@@ -1,13 +1,16 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet, TextInputProps } from 'react-native';
 import { Control, Controller } from 'react-hook-form';
-import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS } from '../theme/theme';
+import { Ionicons } from '@expo/vector-icons';
+import { Colors } from '@/constants/Colors';
+import { BorderRadius, Spacing, Typography, Shadows } from '@/constants/Metrics';
 
 interface FormInputProps extends TextInputProps {
   control: Control<any>;
   name: string;
   label: string;
   error?: string;
+  iconName?: keyof typeof Ionicons.glyphMap;
 }
 
 const FormInput: React.FC<FormInputProps> = ({
@@ -15,6 +18,7 @@ const FormInput: React.FC<FormInputProps> = ({
   name,
   label,
   error,
+  iconName,
   ...props
 }) => {
   return (
@@ -24,14 +28,24 @@ const FormInput: React.FC<FormInputProps> = ({
         control={control}
         name={name}
         render={({ field: { onChange, onBlur, value } }) => (
-          <TextInput
-            style={[styles.input, error && styles.inputError]}
-            onBlur={onBlur}
-            onChangeText={onChange}
-            value={value}
-            placeholderTextColor={COLORS.gray[400]}
-            {...props}
-          />
+          <View style={[styles.inputContainer, error && styles.inputError]}>
+            {iconName && (
+              <Ionicons 
+                name={iconName} 
+                size={20} 
+                color={Colors.blue} 
+                style={styles.icon} 
+              />
+            )}
+            <TextInput
+              style={[styles.input, iconName && styles.inputWithIcon]}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              placeholderTextColor={Colors.light.placeholder}
+              {...props}
+            />
+          </View>
         )}
       />
       {error && <Text style={styles.errorText}>{error}</Text>}
@@ -41,30 +55,45 @@ const FormInput: React.FC<FormInputProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: SPACING[4],
+    marginBottom: Spacing.medium,
   },
   label: {
-    fontSize: TYPOGRAPHY.fontSize.base,
-    fontWeight: '600',
-    color: COLORS.text.primary,
-    marginBottom: SPACING[2],
+    fontSize: Typography.fontSize.sm,
+    fontWeight: Typography.fontWeight.medium,
+    color: Colors.darkGray,
+
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderColor: Colors.light.inputBorder,
+    borderRadius: BorderRadius.medium,
+    backgroundColor: Colors.white,
+    minHeight: 56,
+  },
+  icon: {
+
+    marginRight: Spacing.small,
   },
   input: {
-    borderWidth: 1,
-    borderColor: COLORS.gray[300],
-    borderRadius: BORDER_RADIUS.base,
-    padding: SPACING[3],
-    fontSize: TYPOGRAPHY.fontSize.base,
-    backgroundColor: COLORS.white,
-    color: COLORS.text.primary,
+    flex: 1,
+    padding: Spacing.medium,
+    fontSize: Typography.fontSize.lg,
+    fontWeight: Typography.fontWeight.semibold,
+    color: Colors.black,
+    borderWidth: 0,
+  },
+  inputWithIcon: {
+    paddingLeft: 0,
   },
   inputError: {
-    borderColor: COLORS.error,
+    borderColor: Colors.error,
   },
   errorText: {
-    color: COLORS.text.error,
-    fontSize: TYPOGRAPHY.fontSize.sm,
-    marginTop: SPACING[1],
+    color: Colors.error,
+    fontSize: Typography.fontSize.sm,
+    marginTop: Spacing.small,
   },
 });
 

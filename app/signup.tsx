@@ -3,16 +3,17 @@ import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView } fr
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { APP_CONSTANTS } from '../constants/appConstants';
-import { signUp } from '../services/authService';
-import { getAuthErrorMessage } from '../utils/authErrors';
-import FormInput from '../components/FormInput';
-import { COLORS, TYPOGRAPHY, SPACING } from '../theme/theme';
-import CustomButton from '../components/CustomButton';
-import { signupSchema, SignupFormData } from '../schemas/authSchema';
-import Toast from '../components/Toast';
+import { router } from 'expo-router';
+import { APP_CONSTANTS } from '@/constants/appConstants';
+import { signUp } from '@/services/authService';
+import FormInput from '@/components/FormInput';
+import { Colors } from '@/constants/Colors';
+import { Spacing, Typography } from '@/constants/Metrics';
+import CustomButton from '@/components/CustomButton';
+import { signupSchema, SignupFormData } from '@/schemas/authSchema';
+import Toast from '@/components/Toast';
 
-const SignupScreen = ({ navigation }: any) => {
+export default function SignupScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
@@ -43,7 +44,7 @@ const SignupScreen = ({ navigation }: any) => {
         setToast({ message: 'Account created successfully! You can now sign in.', type: 'success' });
         // Navigate to login after a short delay
         setTimeout(() => {
-          navigation.navigate('Login');
+          router.replace('/');
         }, 2000);
       }
     } catch (error: any) {
@@ -55,8 +56,8 @@ const SignupScreen = ({ navigation }: any) => {
   };
 
   const goToLogin = React.useCallback(() => {
-    navigation.navigate('Login');
-  }, [navigation]);
+    router.replace('/login');
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -134,12 +135,12 @@ const SignupScreen = ({ navigation }: any) => {
       )}
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.white,
+    backgroundColor: Colors.white,
   },
   scrollContent: {
     flexGrow: 1,
@@ -147,41 +148,40 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: SPACING[5],
-    paddingVertical: SPACING[6],
+    paddingHorizontal: Spacing.large,
+    paddingVertical: Spacing.large,
   },
   titleContainer: {
-    marginBottom: SPACING[8],
+    marginBottom: Spacing.xlarge,
   },
   title: {
-    fontSize: TYPOGRAPHY.fontSize['3xl'],
-    fontWeight: 'bold',
-    color: COLORS.text.primary,
+    fontSize: Typography.fontSize['3xl'],
+    fontWeight: Typography.fontWeight.bold,
+    color: Colors.light.text,
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: TYPOGRAPHY.fontSize.base,
-    color: COLORS.text.secondary,
+    fontSize: Typography.fontSize.base,
+    color: Colors.light.text,
     textAlign: 'center',
-    marginTop: SPACING[1],
+    marginTop: Spacing.small,
   },
   form: {
-    gap: SPACING[4],
+    gap: Spacing.medium,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: SPACING[6],
+    marginTop: Spacing.large,
   },
   footerText: {
-    color: COLORS.text.secondary,
-    fontSize: TYPOGRAPHY.fontSize.base,
+    color: Colors.light.text,
+    fontSize: Typography.fontSize.base,
   },
   footerLink: {
-    color: COLORS.primary,
-    fontWeight: '600',
-    marginLeft: SPACING[1],
+    color: Colors.blue,
+    fontWeight: Typography.fontWeight.semibold,
+    marginLeft: Spacing.small,
   },
-});
-
-export default SignupScreen; 
+}); 
+ 
