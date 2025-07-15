@@ -8,6 +8,7 @@ import FormInput from "@/components/FormInput";
 import PeopleInput from "@/components/PeopleInput";
 import ClassInput from "@/components/ClassInput";
 import FilterCard from "@/components/FilterCard";
+import TripTypeTabs from "@/components/TripTypeTabs";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 
 import { router } from "expo-router";
@@ -24,6 +25,7 @@ import {
   ImageBackground,
   Image,
   Dimensions,
+  Alert,
 } from "react-native";
 import { Colors } from "@/constants/Colors";
 import { BorderRadius, scale, Spacing, Typography } from "@/constants/Metrics";
@@ -31,8 +33,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useForm } from "react-hook-form";
 import { handleSignOut } from "@/services/authService";
 import Toast from "@/components/Toast";
-import { auth } from "@/firebaseConfig";
-import { onAuthStateChanged, User } from "firebase/auth";
+import { useAuth } from "@/hooks/useAuth";
 
 const { width, height } = Dimensions.get("window");
 
@@ -41,7 +42,7 @@ type SuggestionItem = { id: string; name: string; code: string; entityId: string
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { control } = useForm();
-  const [user, setUser] = useState<User | null>(null);
+  const { user } = useAuth();
   const [fromQuery, setFromQuery] = useState("");
   const [toQuery, setToQuery] = useState("");
   const [debouncedFromQuery, setDebouncedFromQuery] = useState("");
@@ -61,14 +62,7 @@ export default function HomeScreen() {
     type: "success" | "error";
   } | null>(null);
 
-  // Auth state listener
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-
-    return () => unsubscribe();
-  }, []);
+  // Auth state is now managed by useAuth hook
 
   // Debounce logic for autocomplete queries
   useEffect(() => {
@@ -115,20 +109,39 @@ export default function HomeScreen() {
   };
 
   const onSignOut = async () => {
-    try {
-      setIsSigningOut(true);
-      const result = await handleSignOut();
-      if (result.success) {
-        router.replace("/");
-      } else {
-        setToast({ message: result.error || "Sign out failed", type: "error" });
-      }
-    } catch (error) {
-      console.error("Sign out error:", error);
-      setToast({ message: "Sign out failed", type: "error" });
-    } finally {
-      setIsSigningOut(false);
-    }
+    Alert.alert(
+      "Sign Out",
+      "Are you sure you want to sign out?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Sign Out",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              setIsSigningOut(true);
+              const result = await handleSignOut();
+              if (result.success) {
+                // Wait a moment for auth state to clear before navigating
+                setTimeout(() => {
+                  router.replace("/");
+                }, 100);
+              } else {
+                setToast({ message: result.error || "Sign out failed", type: "error" });
+              }
+            } catch (error) {
+              console.error("Sign out error:", error);
+              setToast({ message: "Sign out failed", type: "error" });
+            } finally {
+              setIsSigningOut(false);
+            }
+          },
+        },
+      ]
+    );
   };
 
   const onSearchFlights = () => {
@@ -176,41 +189,25 @@ export default function HomeScreen() {
                 {user?.displayName || user?.email?.split('@')[0] || 'User'}! 👋
               </Text>
             </View>
-            <TouchableOpacity onPress={onSignOut} style={styles.signOutButton}>
-              <Ionicons name="log-out-outline" size={24} color={Colors.white} />
+            <TouchableOpacity 
+              onPress={onSignOut} 
+              style={styles.signOutButton}
+              disabled={isSigningOut}
+            >
+              <Ionicons 
+                name="log-out-outline" 
+                size={24} 
+                color={isSigningOut ? Colors.gray : Colors.white} 
+              />
             </TouchableOpacity>
           </View>
 
           {/* Trip Type Tabs */}
-          <View style={styles.tabContainer}>
-           
-            <TouchableOpacity
-              style={[styles.tab, tripType === "oneway" && styles.activeTab]}
-              onPress={() => setTripType("oneway")}
-            >
-              <Text
-                style={[
-                  styles.tabText,
-                  tripType === "oneway" && styles.activeTabText,
-                ]}
-              >
-                One-Way
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.tab, tripType === "round" && styles.activeTab]}
-              onPress={() => setTripType("round")}
-            >
-              <Text
-                style={[
-                  styles.tabText,
-                  tripType === "round" && styles.activeTabText,
-                ]}
-              >
-                Round trip
-              </Text>
-            </TouchableOpacity>
-          </View>
+          <TripTypeTabs
+            tripType={tripType}
+            setTripType={setTripType}
+            variant="light"
+          />
       </ImageBackground>
 
       {/* White Card Container - 75% */}
@@ -321,28 +318,6 @@ const styles = StyleSheet.create({
   },
   signOutButton: {
     padding: Spacing.small,
-  },
-  tabContainer: {
-    flexDirection: "row",
-    marginBottom: Spacing.medium,
-  },
-  tab: {
-    paddingVertical: Spacing.small,
-    paddingHorizontal: Spacing.medium,
-    marginRight: Spacing.medium,
-  },
-  activeTab: {
-    borderBottomWidth: 2,
-    borderBottomColor: Colors.white,
-  },
-  tabText: {
-    color: "rgba(255, 255, 255, 0.7)",
-    fontSize: Typography.fontSize.base,
-    fontWeight: Typography.fontWeight.medium,
-  },
-  activeTabText: {
-    color: Colors.white,
-    fontWeight: Typography.fontWeight.bold,
   },
 
   // Card Container - 70%

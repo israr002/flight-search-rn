@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, Modal, StyleSheet } from "react-native";
 import { Colors } from "@/constants/Colors";
 import { BorderRadius, Spacing, Typography } from "@/constants/Metrics";
@@ -24,6 +24,11 @@ const PeopleInput: React.FC<PeopleInputProps> = ({
   const [modalVisible, setModalVisible] = useState(false);
   const [localValue, setLocalValue] = useState(value);
 
+  // Update local value when prop changes
+  useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
+
   const totalPassengers =
     localValue.adults + localValue.children + localValue.babies;
 
@@ -36,6 +41,9 @@ const PeopleInput: React.FC<PeopleInputProps> = ({
 
   const handleDone = () => {
     setModalVisible(false);
+  };
+
+  const handleModalClose = () => {
     onChange && onChange(localValue);
   };
 
@@ -68,7 +76,7 @@ const PeopleInput: React.FC<PeopleInputProps> = ({
         visible={modalVisible}
         transparent
         animationType="slide"
-        onRequestClose={() => setModalVisible(false)}
+        onRequestClose={handleModalClose}
       >
         <View style={styles.modalOverlay}>
           <View style={styles.bottomSheet}>

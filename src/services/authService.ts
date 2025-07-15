@@ -13,6 +13,7 @@ import { SignupFormData } from '@/schemas/authSchema';
 import { APP_CONSTANTS } from '@/constants/appConstants';
 import { getAuthErrorMessage } from '@/utils/authErrors';
 import { auth, storage } from '@/firebaseConfig';
+import { clearUserFromStorage } from './authPersistence';
 
 export const signInWithEmail = async (
   email: string,
@@ -97,6 +98,7 @@ export const signUp = async (
 export const handleSignOut = async (): Promise<{ success: boolean; error?: string }> => {
   try {
     await signOut(auth);
+    await clearUserFromStorage();
     return { success: true };
   } catch (error: any) {
     console.error('Sign out error:', error);

@@ -41,11 +41,8 @@ export default function SignupScreen() {
       if (!result.success) {
         setToast({ message: result.error || APP_CONSTANTS.UNKNOWN_ERROR, type: 'error' });
       } else {
-        setToast({ message: 'Account created successfully! You can now sign in.', type: 'success' });
-        // Navigate to login after a short delay
-        setTimeout(() => {
-          router.replace('/');
-        }, 2000);
+        setToast({ message: 'Account created successfully! Redirecting to home...', type: 'success' });
+        // AuthWrapper will handle navigation to home since user is now logged in
       }
     } catch (error: any) {
       console.error('Signup error:', error);

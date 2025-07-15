@@ -146,7 +146,7 @@ const FlightListScreen = () => {
     originEntityId: getParamString(params.originEntityId) || fromSelected?.code || "",
     destinationEntityId: getParamString(params.destinationEntityId) || toSelected?.code || "",
     date: departDate || "",
-    returnDate: tripType === "round" ? returnDate || undefined : undefined,
+    ...(tripType === "round" && returnDate ? { returnDate } : {}),
     adults: people.adults,
     childrens: people.children,
     infants: people.babies,

@@ -4,6 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "@/firebaseConfig"; // Initialize Firebase
 import { useFonts } from "expo-font";
+import AuthWrapper from "@/components/AuthWrapper";
 
 const queryClient = new QueryClient();
 
@@ -18,12 +19,15 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
-        <StatusBar style="light" backgroundColor="transparent" translucent />
-              <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" />
-        <Stack.Screen name="home" />
-        <Stack.Screen name="signup" />
-      </Stack>
+        <AuthWrapper>
+          <StatusBar style="light" backgroundColor="transparent" translucent />
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="index" />
+            <Stack.Screen name="home" />
+            <Stack.Screen name="signup" />
+            <Stack.Screen name="flight-list" />
+          </Stack>
+        </AuthWrapper>
       </QueryClientProvider>
     </GestureHandlerRootView>
   );

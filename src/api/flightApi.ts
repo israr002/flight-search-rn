@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 // ========================
-// SkyScrapper API Constants (from environment variables)
+// SkyScrapper API Constants (for live usage)
 // ========================
 
 const SKY_SCRAPPER_API_KEY = process.env.EXPO_PUBLIC_SKY_SCRAPPER_API_KEY;
@@ -12,20 +12,34 @@ const SKY_SCRAPPER_BASE_URL = process.env.EXPO_PUBLIC_SKY_SCRAPPER_BASE_URL;
 const SKY_SCRAPPER_BASE_URL_V2 = process.env.EXPO_PUBLIC_SKY_SCRAPPER_BASE_URL_V2;
 
 // ========================
-// Live API Functions
+// MOCK Fetch Functions (Default)
+// Replace logic with real API (already commented inside)
 // ========================
 
 export async function fetchAutocomplete(query: string) {
   if (!query) return [];
 
   try {
+    // 🔧 Mock logic (Demo JSON)
+    // const airportsData = await import("../demoData/searchAirports.json");
+    // const airportList = airportsData.data || [];
+
+    // return airportList.map((item: any) => ({
+    //   id: item.skyId,
+    //   name: item.presentation.title,
+    //   suggestionTitle: item.presentation.suggestionTitle,
+    //   code: item.skyId,
+    // }));
+
+    // ✅ Uncomment for real API:
+
     const response = await fetch(
       `${SKY_SCRAPPER_BASE_URL}/flights/searchAirport?query=${query}&locale=en-US`,
       {
         method: "GET",
         headers: {
-          "X-RapidAPI-Key": SKY_SCRAPPER_API_KEY!,
-          "X-RapidAPI-Host": SKY_SCRAPPER_API_HOST!,
+          "X-RapidAPI-Key": SKY_SCRAPPER_API_KEY,
+          "X-RapidAPI-Host": SKY_SCRAPPER_API_HOST,
         },
       }
     );
@@ -38,27 +52,7 @@ export async function fetchAutocomplete(query: string) {
     }));
   } catch (e) {
     console.error("Autocomplete error:", e);
-    // Fallback to mock data if API fails
-    try {
-      const airportsData = await import("../demoData/searchAirports.json");
-      const airportList = airportsData.data || [];
-
-      const filteredAirports = airportList.filter((item: any) => 
-        item.presentation.title.toLowerCase().includes(query.toLowerCase()) ||
-        item.presentation.suggestionTitle.toLowerCase().includes(query.toLowerCase()) ||
-        item.skyId.toLowerCase().includes(query.toLowerCase())
-      );
-
-      return filteredAirports.map((item: any) => ({
-        id: item.navigation.relevantFlightParams.skyId,
-        name: item.presentation.title,
-        code: item.navigation.relevantFlightParams.skyId,
-        entityId: item.navigation.relevantFlightParams.entityId,
-      }));
-    } catch (mockError) {
-      console.error("Mock data fallback error:", mockError);
-      return [];
-    }
+    return [];
   }
 }
 
@@ -78,6 +72,13 @@ export async function fetchFlights(params: {
   market?: string;
   countryCode?: string;
 }) {
+  // 🔧 Mock logic (Demo JSON)
+  // const flightsData = await import("../demoData/searchFlights.json");
+  // const itineraries = flightsData.data?.itineraries || [];
+
+  // return itineraries;
+
+  // ✅ Uncomment for real API:
   // Map params to API query
   const queryParams: Record<string, string> = {
     originSkyId: params.originSkyId,
@@ -88,6 +89,7 @@ export async function fetchFlights(params: {
     cabinClass: params.cabinClass || "economy",
     adults: String(params.adults || 1),
     sortBy: params.sortBy || "best",
+    currency: "INR"
   };
 
   // Add optional parameters
@@ -96,43 +98,38 @@ export async function fetchFlights(params: {
   if (params.infants) queryParams.infants = String(params.infants);
 
   const query = new URLSearchParams(queryParams);
+
   const url = `${SKY_SCRAPPER_BASE_URL_V2}/flights/searchFlights?${query.toString()}`;
 
   try {
-    console.log("Fetching live flight data from:", url);
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        "X-RapidAPI-Key": SKY_SCRAPPER_API_KEY!,
-        "X-RapidAPI-Host": SKY_SCRAPPER_API_HOST!,
+        "X-RapidAPI-Key": SKY_SCRAPPER_API_KEY,
+        "X-RapidAPI-Host": SKY_SCRAPPER_API_HOST,
       },
     });
     const data = await response.json();
-    console.log("Live flight data response:", JSON.stringify(data, null, 2));
+    console.log("data", JSON.stringify(data));
     return data.data?.itineraries || [];
   } catch (e) {
     console.error("Flight search error:", e);
-    // Fallback to mock data if API fails
-    try {
-      const flightsData = await import("../demoData/searchFlights.json");
-      const itineraries = flightsData.data?.itineraries || [];
-      console.log("Using mock flight data fallback, params:", params);
-      return itineraries;
-    } catch (mockError) {
-      console.error("Mock data fallback error:", mockError);
-      return [];
-    }
+    return [];
   }
 }
 
 export async function fetchFlightDetails(flightId: string) {
   try {
-    // Note: SkyScrapper API doesn't offer a specific "flight details by ID" endpoint,
-    // so we'll use the cached flight list approach or mock data
+    // 🔧 Mock logic (Demo JSON)
     const flightsData = await import("../demoData/searchFlights.json");
     const itineraries = flightsData.data?.itineraries || [];
-    console.log("Using mock flight details data for ID:", flightId);
     return itineraries.find((it: any) => it.id === flightId) || null;
+
+    // ✅ Uncomment for real API:
+    /*
+    // Note: SkyScrapper API doesn't offer a specific "flight details by ID" endpoint,
+    // so you may need to cache the full flight list and retrieve from that in real case.
+    */
   } catch (e) {
     console.error("Flight details error:", e);
     return null;

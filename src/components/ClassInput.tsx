@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, Modal, StyleSheet } from "react-native";
 import { Colors } from "@/constants/Colors";
 import { BorderRadius, Spacing, Typography } from "@/constants/Metrics";
@@ -24,8 +24,17 @@ const ClassInput: React.FC<ClassInputProps> = ({
   const [modalVisible, setModalVisible] = useState(false);
   const [selected, setSelected] = useState(value || "economy");
 
+  // Update selected when prop changes
+  useEffect(() => {
+    setSelected(value || "economy");
+  }, [value]);
+
   const handleDone = () => {
     setModalVisible(false);
+  };
+
+  const handleModalClose = () => {
+    // Only call onChange when the modal is actually closed
     onChange && onChange(selected);
   };
 
@@ -53,7 +62,7 @@ const ClassInput: React.FC<ClassInputProps> = ({
         visible={modalVisible}
         transparent
         animationType="slide"
-        onRequestClose={() => setModalVisible(false)}
+        onRequestClose={handleModalClose}
       >
         <View style={styles.modalOverlay}>
           <View style={styles.bottomSheet}>

@@ -59,7 +59,11 @@ export default function LoginScreen() {
           type: "error",
         });
       } else {
-        router.replace("/home");
+        setToast({
+          message: "Login successful!",
+          type: "success",
+        });
+        // AuthWrapper will handle navigation automatically when auth state changes
       }
     } catch (error: any) {
       console.error("Auth error:", error);
@@ -74,11 +78,11 @@ export default function LoginScreen() {
   }, []);
 
   // Animation for airplane
-  const airplaneAnim = useRef(new Animated.Value(-400)).current; // Start off-screen left
+  const airplaneAnim = useRef(new Animated.Value(-300)).current; // Start off-screen left
 
   useEffect(() => {
     Animated.timing(airplaneAnim, {
-      toValue: 0, // End at its current position
+      toValue: 0,
       duration: 2000,
       useNativeDriver: true,
     }).start();
@@ -260,3 +264,4 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
 });
+ 
