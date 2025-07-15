@@ -43,6 +43,7 @@ interface FilterCardProps {
   onFromSelect?: (item: SuggestionItem) => void;
   toValue?: string;
   onToSelect?: (item: SuggestionItem) => void;
+  noNegativeMargin?: boolean; // Add prop to control negative margin
 }
 
 const FilterCard: React.FC<FilterCardProps> = ({
@@ -77,10 +78,11 @@ const FilterCard: React.FC<FilterCardProps> = ({
   onFromSelect,
   toValue,
   onToSelect,
+  noNegativeMargin = false,
 }) => {
   console.log("fromSuggestion", fromSuggestions);
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, noNegativeMargin && styles.cardNoMargin]}>
       <AutocompleteDropdown
         value={fromValue !== undefined ? fromValue : fromSelected?.name || ""}
         onChange={setFromQuery}
@@ -157,6 +159,9 @@ const styles = StyleSheet.create({
     elevation: 5,
     marginBottom: Spacing.medium,
     marginTop: -70,
+  },
+  cardNoMargin: {
+    marginTop: 0,
   },
   buttonContainer: {
     marginTop: Spacing.medium,

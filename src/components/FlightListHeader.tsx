@@ -32,7 +32,7 @@ const FlightListHeader: React.FC<Props> = ({
   return (
     <View style={styles.headerContainer}>
       <ImageBackground
-        source={require("../../assets/images/world-map.png")}
+        source={require("../assets/images/world-map.png")}
         style={[styles.bg, { paddingTop: topPadding }]}
         imageStyle={styles.bgImage}
       >

@@ -17,6 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FilterCard, { SuggestionItem } from "@/components/FilterCard";
 import FlightListHeader from "@/components/FlightListHeader";
 import FlightCard, { Flight } from "@/components/FlightCard";
+import TripTypeTabs from "@/components/TripTypeTabs";
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { useAutocomplete } from "@/api/flightApi";
 
@@ -205,7 +206,7 @@ const FlightListScreen = () => {
     return (
       <View style={styles.centered}>
         <LottieView
-          source={require("../assets/animations/plane.json")}
+          source={require("../src/assets/animations/plane.json")}
           autoPlay
           loop
           style={{ width: 300, height: 300 }}
@@ -291,6 +292,14 @@ const FlightListScreen = () => {
       >
         <BottomSheetView style={styles.bottomSheetContent}>
           <Text style={styles.bottomSheetTitle}>Edit Search</Text>
+          
+          {/* Trip Type Tabs */}
+          <TripTypeTabs
+            tripType={tripType}
+            setTripType={setTripType}
+            variant="dark"
+          />
+          
           <FilterCard
             fromQuery={fromQuery}
             setFromQuery={setFromQuery}
@@ -331,6 +340,7 @@ const FlightListScreen = () => {
               setToQuery(item.name);
               setToFocused(false);
             }}
+            noNegativeMargin={true}
           />
         </BottomSheetView>
       </BottomSheet>
