@@ -1,252 +1,160 @@
-import { useAutocomplete } from "@/api/flightApi";
-import AutocompleteDropdown from "@/components/AutoCompleteDropdown";
-import DateRangePicker from "@/components/DateRangePicker";
-import CustomButton from "@/components/CustomButton";
-import LocationInput from "@/components/LocationInput";
-import SwapButton from "@/components/SwapButton";
-import FormInput from "@/components/FormInput";
-import PeopleInput from "@/components/PeopleInput";
-import ClassInput from "@/components/ClassInput";
-import FilterCard from "@/components/FilterCard";
-import { MaterialIcons, Ionicons } from "@expo/vector-icons";
-
-import { router } from "expo-router";
-import { useState, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
   View,
-  SafeAreaView,
-  ImageBackground,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
   Image,
-  Dimensions,
+  Animated,
 } from "react-native";
-import { Colors } from "@/constants/Colors";
-import { BorderRadius, scale, Spacing, Typography } from "@/constants/Metrics";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useForm } from "react-hook-form";
-import { handleSignOut } from "@/services/authService";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { router } from "expo-router";
+import { APP_CONSTANTS } from "@/constants/appConstants";
+import { signInWithEmail } from "@/services/authService";
+import FormInput from "@/components/FormInput";
+import { Colors } from "@/constants/Colors";
+import { BorderRadius, Spacing, Typography } from "@/constants/Metrics";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import CustomButton from "@/components/CustomButton";
+import { authSchema, AuthFormData } from "@/schemas/authSchema";
 import Toast from "@/components/Toast";
 
-const { width, height } = Dimensions.get("window");
+type LoginFormData = z.infer<typeof authSchema>;
 
-type SuggestionItem = { id: string; name: string; code: string; entityId: string };
-
-export default function HomeScreen() {
+export default function LoginScreen() {
   const insets = useSafeAreaInsets();
-  const { control } = useForm();
-  const [fromQuery, setFromQuery] = useState("");
-  const [toQuery, setToQuery] = useState("");
-  const [debouncedFromQuery, setDebouncedFromQuery] = useState("");
-  const [debouncedToQuery, setDebouncedToQuery] = useState("");
-  const [fromSelected, setFromSelected] = useState<SuggestionItem | null>(null);
-  const [toSelected, setToSelected] = useState<SuggestionItem | null>(null);
-  const [fromFocused, setFromFocused] = useState(false);
-  const [toFocused, setToFocused] = useState(false);
-  const [tripType, setTripType] = useState<"oneway" | "round">("round");
-  const [departDate, setDepartDate] = useState<string | null>(null);
-  const [returnDate, setReturnDate] = useState<string | null>(null);
-  const [people, setPeople] = useState({ adults: 1, children: 0, babies: 0 });
-  const [flightClass, setFlightClass] = useState("economy");
-  const [isSigningOut, setIsSigningOut] = useState(false);
+  const [isEmailLoading, setIsEmailLoading] = useState(false);
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
   } | null>(null);
 
-  // Debounce logic for autocomplete queries
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedFromQuery(fromQuery);
-    }, 300); // 300ms delay
+  React.useEffect(() => {
+    if (toast && toast.message) {
+      const timer = setTimeout(() => {
+        setToast(null);
+      }, 5000);
 
-    return () => clearTimeout(timer);
-  }, [fromQuery]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedToQuery(toQuery);
-    }, 300); // 300ms delay
-
-    return () => clearTimeout(timer);
-  }, [toQuery]);
-
-  const { data: fromSuggestions = [] } = useAutocomplete(debouncedFromQuery);
-  const { data: toSuggestions = [] } = useAutocomplete(debouncedToQuery);
-
-  const onSearch = () => {
-    if (!fromQuery || !toQuery || !departDate) {
-      setToast({
-        message: "Please fill in all required fields",
-        type: "error",
-      });
-      return;
+      return () => clearTimeout(timer);
     }
+  }, [toast]);
 
-    setToast({
-      message: `Searching flights from ${fromQuery} to ${toQuery} on ${departDate}`,
-      type: "success",
-    });
-  };
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(authSchema),
+  });
 
-  const swapFromTo = () => {
-    const tempQuery = fromQuery;
-    setFromQuery(toQuery);
-    setToQuery(tempQuery);
-    const tempSelected = fromSelected;
-    setFromSelected(toSelected);
-    setToSelected(tempSelected);
-  };
-
-  const onSignOut = async () => {
+  const onSubmit = async (data: AuthFormData) => {
     try {
-      setIsSigningOut(true);
-      const result = await handleSignOut();
-      if (result.success) {
-        router.replace("/login");
+      setIsEmailLoading(true);
+      const result = await signInWithEmail(data.email, data.password);
+      if (!result.success) {
+        setToast({
+          message: result.error || APP_CONSTANTS.UNKNOWN_ERROR,
+          type: "error",
+        });
       } else {
-        setToast({ message: result.error || "Sign out failed", type: "error" });
+        router.replace("/home");
       }
-    } catch (error) {
-      console.error("Sign out error:", error);
-      setToast({ message: "Sign out failed", type: "error" });
+    } catch (error: any) {
+      console.error("Auth error:", error);
+      setToast({ message: APP_CONSTANTS.UNKNOWN_ERROR, type: "error" });
     } finally {
-      setIsSigningOut(false);
+      setIsEmailLoading(false);
     }
   };
 
-  const onSearchFlights = () => {
-    if (!fromSelected || !toSelected || !departDate) {
-      setToast({
-        message: "Please fill in all required fields",
-        type: "error",
-      });
-      return;
-    }
-    router.push({
-      pathname: "/flight-list",
-      params: {
-        originSkyId: fromSelected.code,
-        destinationSkyId: toSelected.code,
-        originEntityId: fromSelected.entityId,
-        destinationEntityId: toSelected.entityId,
-        date: departDate,
-        returnDate: tripType === "round" ? returnDate : undefined,
-        adults: people.adults,
-        childrens: people.children,
-        infants: people.babies,
-        cabinClass: flightClass,
-      },
-    });
-  };
+  const goToSignup = React.useCallback(() => {
+    router.push("/signup");
+  }, []);
+
+  // Animation for airplane
+  const airplaneAnim = useRef(new Animated.Value(-400)).current; // Start off-screen left
+
+  useEffect(() => {
+    Animated.timing(airplaneAnim, {
+      toValue: 0, // End at its current position
+      duration: 2000,
+      useNativeDriver: true,
+    }).start();
+  }, []);
 
   return (
     <View style={styles.container}>
-      {/* Background Container - 30% */}
-      <ImageBackground
-        source={require("../assets/images/world-map.png")}
-        style={styles.backgroundContainer}
-        imageStyle={styles.backgroundImage}
-      >
-          {/* Header */}
-          <View
-            style={[styles.header, { paddingTop: insets.top + Spacing.small }]}
-          >
-            <View style={styles.headerContent}>
-              <Image
-                source={require("../assets/icon.png")}
-                style={styles.logo}
-                resizeMode="contain"
-              />
-              <Text style={styles.brandText}>VIETNAM AIRLINES</Text>
-            </View>
-            <TouchableOpacity onPress={onSignOut} style={styles.signOutButton}>
-              <Ionicons name="log-out-outline" size={24} color={Colors.white} />
-            </TouchableOpacity>
-          </View>
+      {/* Header Background - 40% */}
+      <View style={[styles.backgroundContainer, { paddingTop: insets.top }]}>
+        <View style={styles.header}>
+          <Text style={styles.brandText}>SkyBook</Text>
+        </View>
 
-          {/* Trip Type Tabs */}
-          <View style={styles.tabContainer}>
-            <TouchableOpacity
-              style={[styles.tab, tripType === "round" && styles.activeTab]}
-              onPress={() => setTripType("round")}
-            >
-              <Text
-                style={[
-                  styles.tabText,
-                  tripType === "round" && styles.activeTabText,
-                ]}
-              >
-                Round trip
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.tab, tripType === "oneway" && styles.activeTab]}
-              onPress={() => setTripType("oneway")}
-            >
-              <Text
-                style={[
-                  styles.tabText,
-                  tripType === "oneway" && styles.activeTabText,
-                ]}
-              >
-                One-Way
-              </Text>
-            </TouchableOpacity>
-          </View>
-      </ImageBackground>
-
-      {/* White Card Container - 75% */}
-      <View style={styles.cardContainer}>
-        <FilterCard
-          fromQuery={fromQuery}
-          setFromQuery={setFromQuery}
-          toQuery={toQuery}
-          setToQuery={setToQuery}
-          fromSelected={fromSelected}
-          setFromSelected={setFromSelected}
-          toSelected={toSelected}
-          setToSelected={setToSelected}
-          fromSuggestions={fromSuggestions}
-          toSuggestions={toSuggestions}
-          fromFocused={fromFocused}
-          setFromFocused={setFromFocused}
-          toFocused={toFocused}
-          setToFocused={setToFocused}
-          swapFromTo={swapFromTo}
-          tripType={tripType}
-          setTripType={setTripType}
-          departDate={departDate}
-          setDepartDate={setDepartDate}
-          returnDate={returnDate}
-          setReturnDate={setReturnDate}
-          people={people}
-          setPeople={setPeople}
-          flightClass={flightClass}
-          setFlightClass={setFlightClass}
-          onSearchFlights={onSearchFlights}
-          // Override the value and onSelect logic for both fields:
-          fromValue={fromQuery}
-          onFromSelect={(item) => {
-            setFromSelected(item);
-            setFromQuery(item.name);
-            setFromFocused(false);
-          }}
-          toValue={toQuery}
-          onToSelect={(item) => {
-            setToSelected(item);
-            setToQuery(item.name);
-            setToFocused(false);
-          }}
+        <Animated.Image
+          source={require("../src/assets/images/airplane.png")}
+          style={[
+            styles.backgroundImage,
+            { transform: [{ translateX: airplaneAnim }] },
+          ]}
         />
+
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>{APP_CONSTANTS.LOGIN_TITLE}</Text>
+          <Text style={styles.subtitle}>{APP_CONSTANTS.LOGIN_SUBTITLE}</Text>
+        </View>
+      </View>
+
+      {/* Form Container - 60% */}
+      <View style={styles.formContainer}>
+        <View style={styles.formCard}>
+          <View style={styles.form}>
+            <FormInput
+              testID="email-input"
+              control={control}
+              name="email"
+              label={APP_CONSTANTS.EMAIL_LABEL}
+              placeholder={APP_CONSTANTS.EMAIL_PLACEHOLDER}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              error={errors.email?.message}
+            />
+            <FormInput
+              testID="password-input"
+              control={control}
+              name="password"
+              label={APP_CONSTANTS.PASSWORD_LABEL}
+              placeholder={APP_CONSTANTS.PASSWORD_PLACEHOLDER}
+              secureTextEntry
+              error={errors.password?.message}
+            />
+            <CustomButton
+              testID="sign-in-button"
+              title={APP_CONSTANTS.SIGN_IN_BUTTON}
+              onPress={handleSubmit(onSubmit)}
+              variant="primary"
+              isLoading={isEmailLoading}
+              disabled={isEmailLoading}
+            />
+          </View>
+
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>
+              {APP_CONSTANTS.NO_ACCOUNT_TEXT}{" "}
+            </Text>
+            <TouchableOpacity testID="signup-link" onPress={goToSignup}>
+              <Text style={styles.footerLink}>
+                {APP_CONSTANTS.SIGN_UP_LINK}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
 
       {toast && (
         <Toast
+          testID="toast-message"
           message={toast.message}
           type={toast.type}
           onHide={() => setToast(null)}
@@ -262,133 +170,93 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
   },
 
-  // Background Container - 25%
+  // Background Container - 40%
   backgroundContainer: {
-    height: "25%", // 25% of screen height
+    height: "40%",
     width: "100%",
-    overflow: "hidden",
     backgroundColor: Colors.blue,
     borderBottomLeftRadius: BorderRadius.large,
     borderBottomRightRadius: BorderRadius.large,
     paddingHorizontal: Spacing.medium,
+    //paddingBottom: Spacing.large,
   },
+
   backgroundImage: {
-    width: "100%",
-    height: "100%",
-    opacity: 1,
-    resizeMode: "cover",
-    borderBottomLeftRadius: BorderRadius.large,
-    borderBottomRightRadius: BorderRadius.large,
+    height: 100,
+    width: 350,
+    opacity: 0.6,
+    marginTop: Spacing.medium,
   },
 
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    paddingTop: Spacing.small,
-    paddingBottom: Spacing.medium,
-  },
-  headerContent: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  logo: {
-    width: 40,
-    height: 40,
-    marginRight: Spacing.small,
-  },
-  brandText: {
-    color: Colors.white,
-    fontSize: Typography.fontSize.sm,
-    fontWeight: Typography.fontWeight.bold,
-    letterSpacing: 1,
-  },
-  signOutButton: {
-    padding: Spacing.small,
-  },
-  tabContainer: {
-    flexDirection: "row",
-    marginBottom: Spacing.medium,
-  },
-  tab: {
-    paddingVertical: Spacing.small,
-    paddingHorizontal: Spacing.medium,
-    marginRight: Spacing.medium,
-  },
-  activeTab: {
-    borderBottomWidth: 2,
-    borderBottomColor: Colors.white,
-  },
-  tabText: {
-    color: "rgba(255, 255, 255, 0.7)",
-    fontSize: Typography.fontSize.base,
-    fontWeight: Typography.fontWeight.medium,
-  },
-  activeTabText: {
-    color: Colors.white,
-    fontWeight: Typography.fontWeight.bold,
+    justifyContent: "center",
+    paddingTop: Spacing.medium,
+    paddingBottom: Spacing.large,
   },
 
-  // Card Container - 70%
-  cardContainer: {
-    flex: 1, // Takes remaining space (70%)
-    backgroundColor: Colors.white,
-    //borderTopLeftRadius: BorderRadius.xlarge,
-    //borderTopRightRadius: BorderRadius.xlarge,
-    //marginTop: -BorderRadius.xlarge, // Overlap with background
-    paddingTop: Spacing.large,
-    paddingHorizontal: Spacing.medium,
-  },
-  card: {
-    backgroundColor: Colors.white,
-    borderRadius: BorderRadius.large,
-    padding: Spacing.large,
-    shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
-    marginBottom: Spacing.medium,
-    marginTop: -20,
-  },
-  cardTitle: {
+  brandText: {
+    color: Colors.white,
     fontSize: Typography.fontSize.xl,
     fontWeight: Typography.fontWeight.bold,
-    color: Colors.blue,
-    marginBottom: Spacing.small,
+    letterSpacing: 1,
+    fontFamily:
+      Typography.fontFamily.poppinsBold || Typography.fontFamily.poppinsRegular,
   },
-  cardSubtitle: {
+
+  titleContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  title: {
+    fontSize: Typography.fontSize["2xl"],
+    fontWeight: Typography.fontWeight.bold,
+    color: Colors.white,
+    textAlign: "center",
+    fontFamily:
+      Typography.fontFamily.poppinsBold || Typography.fontFamily.poppinsRegular,
+  },
+  subtitle: {
     fontSize: Typography.fontSize.base,
-    color: Colors.darkGray,
-  },
-  locationSection: {
-    position: "relative",
-    borderWidth: 1,
-    borderColor: Colors.gray,
-    padding: scale(16),
-    borderRadius: BorderRadius.xlarge,
-  },
-  locationRow: {
-    // flexDirection: "row",
-    // alignItems: "center",
-  },
-  airplaneIcon: {
-    marginRight: Spacing.small,
-  },
-  horizontalLine: {
-    borderColor: Colors.gray,
-    borderBottomWidth: 1,
-    borderStyle: "dashed",
-    marginHorizontal: Spacing.large,
-  },
-  buttonContainer: {
-    marginTop: Spacing.medium,
-  },
-  selectedInfo: {
-    fontSize: Typography.fontSize.sm,
-    color: Colors.darkGray,
+    color: "rgba(255, 255, 255, 0.8)",
+    textAlign: "center",
     marginTop: Spacing.small,
-    marginLeft: Spacing.large,
+    fontFamily: Typography.fontFamily.poppinsRegular,
+  },
+
+  // Form Container - 60%
+  formContainer: {
+    flex: 1,
+    backgroundColor: Colors.white,
+    paddingTop: Spacing.large,
+  },
+  formCard: {
+    flex: 1,
+    paddingHorizontal: Spacing.large,
+    justifyContent: "center",
+  },
+  form: {
+    gap: Spacing.medium,
+  },
+  footer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "baseline",
+    marginTop: Spacing.xlarge,
+    paddingVertical: Spacing.medium,
+  },
+  footerText: {
+    color: Colors.darkGray,
+    fontSize: Typography.fontSize.sm,
+    fontFamily: Typography.fontFamily.poppinsRegular,
+  },
+  footerLink: {
+    color: Colors.blue,
+    fontSize: Typography.fontSize.sm,
+    fontWeight: Typography.fontWeight.bold,
+    fontFamily:
+      Typography.fontFamily.poppinsBold || Typography.fontFamily.poppinsRegular,
+    textDecorationLine: "underline",
   },
 });
- 

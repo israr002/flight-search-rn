@@ -56,7 +56,7 @@ export default function SignupScreen() {
   };
 
   const goToLogin = React.useCallback(() => {
-    router.replace('/login');
+    router.replace('/');
   }, []);
 
   return (
@@ -65,7 +65,7 @@ export default function SignupScreen() {
         <View style={styles.content}>
           <View style={styles.titleContainer}>
             <Text style={styles.title}>Create Account</Text>
-            <Text style={styles.subtitle}>Join SkyBook to start booking flights</Text>
+            <Text style={styles.subtitle}>Join SkyBook to start checking flights</Text>
           </View>
 
           <View style={styles.form}>
@@ -117,7 +117,7 @@ export default function SignupScreen() {
           </View>
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Already have an account?</Text>
+            <Text style={styles.footerText}>Already have an account? </Text>
             <TouchableOpacity testID="login-link" onPress={goToLogin}>
               <Text style={styles.footerLink}>Sign in</Text>
             </TouchableOpacity>
@@ -172,16 +172,21 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: Spacing.large,
+    alignItems: 'baseline',
+    marginTop: Spacing.xlarge,
+    paddingVertical: Spacing.medium,
   },
   footerText: {
-    color: Colors.light.text,
-    fontSize: Typography.fontSize.base,
+    color: Colors.darkGray,
+    fontSize: Typography.fontSize.sm,
+    fontFamily: Typography.fontFamily.poppinsRegular,
   },
   footerLink: {
     color: Colors.blue,
-    fontWeight: Typography.fontWeight.semibold,
-    marginLeft: Spacing.small,
+    fontSize: Typography.fontSize.sm,
+    fontWeight: Typography.fontWeight.bold,
+    fontFamily: Typography.fontFamily.poppinsBold || Typography.fontFamily.poppinsRegular,
+    textDecorationLine: 'underline',
   },
 }); 
  

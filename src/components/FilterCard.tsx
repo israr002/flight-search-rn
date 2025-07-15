@@ -138,7 +138,7 @@ const FilterCard: React.FC<FilterCardProps> = ({
           title={buttonTitle}
           onPress={onSearchFlights}
           variant="primary"
-          size="large"
+          size="medium"
         />
       </View>
     </View>

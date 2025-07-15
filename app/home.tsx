@@ -162,7 +162,7 @@ export default function HomeScreen() {
     <View style={styles.container}>
       {/* Background Container - 30% */}
       <ImageBackground
-        source={require("../assets/images/world-map.png")}
+        source={require("../src/assets/images/world-map.png")}
         style={styles.backgroundContainer}
         imageStyle={styles.backgroundImage}
       >

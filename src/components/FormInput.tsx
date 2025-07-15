@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet, TextInputProps } from 'react-native';
 import { Control, Controller } from 'react-hook-form';
-import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import { BorderRadius, Spacing, Typography, Shadows } from '@/constants/Metrics';
 
@@ -10,7 +9,6 @@ interface FormInputProps extends TextInputProps {
   name: string;
   label: string;
   error?: string;
-  iconName?: keyof typeof Ionicons.glyphMap;
 }
 
 const FormInput: React.FC<FormInputProps> = ({
@@ -18,7 +16,6 @@ const FormInput: React.FC<FormInputProps> = ({
   name,
   label,
   error,
-  iconName,
   ...props
 }) => {
   return (
@@ -29,16 +26,8 @@ const FormInput: React.FC<FormInputProps> = ({
         name={name}
         render={({ field: { onChange, onBlur, value } }) => (
           <View style={[styles.inputContainer, error && styles.inputError]}>
-            {iconName && (
-              <Ionicons 
-                name={iconName} 
-                size={20} 
-                color={Colors.blue} 
-                style={styles.icon} 
-              />
-            )}
             <TextInput
-              style={[styles.input, iconName && styles.inputWithIcon]}
+              style={styles.input}
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
@@ -56,12 +45,15 @@ const FormInput: React.FC<FormInputProps> = ({
 const styles = StyleSheet.create({
   container: {
     marginBottom: Spacing.medium,
+    
   },
-  label: {
-    fontSize: Typography.fontSize.sm,
+    label: {
+    fontSize: Typography.fontSize.xs,
     fontWeight: Typography.fontWeight.medium,
     color: Colors.darkGray,
-
+    fontFamily: Typography.fontFamily.poppinsRegular,
+    marginBottom: 2,
+    marginLeft: Spacing.medium,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -70,22 +62,18 @@ const styles = StyleSheet.create({
     borderColor: Colors.light.inputBorder,
     borderRadius: BorderRadius.medium,
     backgroundColor: Colors.white,
-    minHeight: 56,
-  },
-  icon: {
-
-    marginRight: Spacing.small,
+    paddingVertical: Spacing.xsmall,
+    marginBottom: Spacing.medium,
   },
   input: {
     flex: 1,
-    padding: Spacing.medium,
-    fontSize: Typography.fontSize.lg,
+    paddingHorizontal: Spacing.medium,
+    paddingVertical: Spacing.small,
+    fontSize: Typography.fontSize.sm,
     fontWeight: Typography.fontWeight.semibold,
     color: Colors.black,
+    fontFamily: Typography.fontFamily.poppinsRegular,
     borderWidth: 0,
-  },
-  inputWithIcon: {
-    paddingLeft: 0,
   },
   inputError: {
     borderColor: Colors.error,
